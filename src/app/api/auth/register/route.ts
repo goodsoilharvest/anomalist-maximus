@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// Registration is admin-controlled — disabled for public signups
+const REGISTRATION_OPEN = process.env.REGISTRATION_OPEN === "true";
+
 export async function POST(req: NextRequest) {
+  if (!REGISTRATION_OPEN) {
+    return NextResponse.json({ error: "Registration is currently by invite only." }, { status: 403 });
+  }
+
   const { name, email, password } = await req.json();
 
   if (!email || !password) {
