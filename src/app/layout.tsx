@@ -29,6 +29,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+      </head>
       <body className="min-h-screen flex flex-col">{children}</body>
     </html>
   );

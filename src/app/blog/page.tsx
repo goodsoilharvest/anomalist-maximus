@@ -36,7 +36,7 @@ export default function BlogPage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[var(--bg-primary)]/85 backdrop-blur-xl border-b border-[var(--border)]">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold">Anomalist <span className="accent">Studios</span></Link>
+          <Link href="/"><img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" /></Link>
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Home</Link>
             <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">About</Link>
@@ -93,7 +93,7 @@ export default function BlogPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] bg-[var(--bg-secondary)] py-12 px-6">
         <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between gap-8">
-          <p className="font-bold text-lg">Anomalist <span className="accent">Studios</span></p>
+          <img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" />
           <div className="flex gap-8 text-sm text-[var(--text-secondary)]">
             <Link href="/" className="hover:text-[var(--text-primary)]">Home</Link>
             <Link href="/about" className="hover:text-[var(--text-primary)]">About</Link>

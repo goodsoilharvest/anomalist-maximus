@@ -186,15 +186,14 @@ export default function HomePage() {
       <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[rgba(10,10,10,0.85)] backdrop-blur-xl border-b border-transparent transition-all">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center h-full">
-            <span className="text-xl font-bold text-[var(--text-primary)]">Anomalist <span className="accent">Studios</span></span>
+            <img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" />
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-primary)]">Home</Link>
             <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">About</Link>
             <Link href="/blog" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Blog</Link>
-            <Link href="/onboarding" className="btn btn-primary text-sm !py-2.5 !px-6">Get Started</Link>
+            <Link href="/onboarding" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Get Started</Link>
           </div>
-          <Link href="/onboarding" className="md:hidden btn btn-primary text-sm !py-2 !px-5">Get Started</Link>
         </div>
       </nav>
 
@@ -278,13 +277,16 @@ export default function HomePage() {
           {/* Platform tabs */}
           <Reveal delay={400}>
             <h3 className="text-[1.15rem] text-[var(--text-secondary)] font-medium mb-8">Same brand. Four platforms + blog + email. Each one native.</h3>
-            <div className="flex flex-wrap justify-center gap-2 mb-8">
-              {platformExamples.map(p => (
-                <button key={p.key} onClick={() => setActiveTab(p.key)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === p.key ? "bg-[var(--accent)] text-[var(--bg-primary)]" : "bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-light)]"}`}>
-                  <span>{p.icon}</span> {p.label}
-                </button>
-              ))}
+            <div className="flex flex-wrap justify-center gap-1.5 mb-6">
+              {platformExamples.map(p => {
+                const faIcons: Record<string, string> = { facebook: "fab fa-facebook-f", instagram: "fab fa-instagram", linkedin: "fab fa-linkedin-in", gbp: "fab fa-google", blog: "fas fa-blog", email: "fas fa-envelope" };
+                return (
+                  <button key={p.key} onClick={() => setActiveTab(p.key)}
+                    className={`px-[18px] py-2.5 rounded-lg text-[0.85rem] font-medium flex items-center gap-1.5 transition-all ${activeTab === p.key ? "bg-[rgba(212,145,30,0.1)] border border-[var(--accent)] text-[var(--accent)]" : "bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-light)] hover:text-[var(--text-primary)]"}`}>
+                    <i className={faIcons[p.key] ?? "fas fa-file"} /> {p.label}
+                  </button>
+                );
+              })}
             </div>
           </Reveal>
 
@@ -540,7 +542,7 @@ export default function HomePage() {
         <div className="max-w-[1200px] mx-auto px-6 py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="sm:col-span-2 md:col-span-1">
-              <p className="text-lg font-bold mb-2">Anomalist <span className="accent">Studios</span></p>
+              <img src="/logo.jpg" alt="Anomalist Studios" className="h-[60px] w-auto mb-2" />
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">Maximus by Anomalist Studios — AI-powered content and marketing, delivered to your dashboard.</p>
             </div>
             <div>

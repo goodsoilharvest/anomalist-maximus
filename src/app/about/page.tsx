@@ -1,7 +1,7 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = { title: "About" };
+import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 const techStats = [
   { number: "16", label: "AI Agents Working Together" },
@@ -10,13 +10,74 @@ const techStats = [
   { number: "24hrs", label: "From Onboarding to First Content" },
 ];
 
+function MatrixCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let w: number, h: number, columns: number, drops: number[];
+    const chars = "MAXIMUSANOMALST01アイウエオカキクケコサシスセソ";
+    const fontSize = 14;
+
+    function resize() {
+      const rect = canvas!.parentElement!.getBoundingClientRect();
+      w = canvas!.width = rect.width;
+      h = canvas!.height = rect.height;
+      columns = Math.floor(w / fontSize);
+      drops = Array(columns).fill(1).map(() => Math.random() * -100);
+    }
+
+    function draw() {
+      ctx!.fillStyle = "rgba(10, 10, 10, 0.08)";
+      ctx!.fillRect(0, 0, w, h);
+      ctx!.font = fontSize + "px monospace";
+
+      for (let i = 0; i < columns; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        const brightness = Math.random();
+        if (brightness > 0.92) {
+          ctx!.fillStyle = "rgba(212, 145, 30, 0.9)";
+        } else if (brightness > 0.7) {
+          ctx!.fillStyle = "rgba(212, 145, 30, 0.4)";
+        } else {
+          ctx!.fillStyle = "rgba(212, 145, 30, 0.15)";
+        }
+
+        ctx!.fillText(char, x, y);
+
+        if (y > h && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    draw();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-[1]" />;
+}
+
 export default function AboutPage() {
   return (
     <>
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[var(--bg-primary)]/85 backdrop-blur-xl border-b border-[var(--border)]">
+      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[rgba(10,10,10,0.85)] backdrop-blur-xl border-b border-[var(--border)]">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold">Anomalist <span className="accent">Studios</span></Link>
+          <Link href="/" className="flex items-center h-full">
+            <img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" />
+          </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Home</Link>
             <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-primary)]">About</Link>
@@ -35,39 +96,65 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Problem */}
+      {/* Problem — text left, Matrix canvas right */}
       <section className="py-[100px] px-6">
-        <div className="max-w-[800px] mx-auto">
-          <h2 className="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">Content shouldn&apos;t be this hard.</h2>
-          <div className="space-y-6 text-[1.05rem] text-[var(--text-secondary)] leading-[1.8]">
-            <p>
-              Every small business owner knows they need to post on social media. Facebook, Instagram, LinkedIn, Google Business Profile — every day, every platform, every audience expects something different.
-            </p>
-            <p>
-              Then there&apos;s the blog. The email list. The ad campaigns. The seasonal promotions. The competitor who seems to be everywhere at once while you&apos;re trying to remember your Instagram password.
-            </p>
-            <p>
-              Hiring a social media manager costs <strong className="text-[var(--text-primary)]">$3,000–$5,000 a month</strong>. Freelancers come and go. DIY AI tools make you do all the work yourself — writing prompts, editing output, scheduling posts, managing accounts. You saved $20 on a subscription and spent 15 hours a week doing marketing.
-            </p>
-            <p>That&apos;s not a solution. That&apos;s just a different kind of job.</p>
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">Content shouldn&apos;t be this hard.</h2>
+              <div className="space-y-5 text-[1.05rem] text-[var(--text-secondary)] leading-[1.8]">
+                <p>Every small business owner knows the drill. You need to post on social media. You need to be consistent. You need to sound professional but still sound like yourself. You need to do it across Facebook, Instagram, LinkedIn, Google Business Profile — and somehow keep up with a blog, email list, and ad campaigns on top of it.</p>
+                <p>Most businesses start strong. They post for a week or two, maybe a month. Then a busy season hits, or a key employee leaves, or life just gets in the way. The accounts go quiet. The algorithm buries them.</p>
+                <p>Hiring a social media manager costs <strong className="text-[var(--text-primary)]">$3,000–$5,000 a month</strong> — and they still need direction, content briefs, and constant feedback. Freelancers are cheaper but inconsistent. DIY tools put the work back on you.</p>
+              </div>
+            </div>
+            {/* Matrix canvas */}
+            <div className="relative h-[400px] rounded-xl overflow-hidden bg-[var(--bg-primary)]">
+              <MatrixCanvas />
+              <div className="absolute inset-0 flex items-center justify-center z-[2]">
+                <span className="text-[8rem] font-black text-[var(--accent)] drop-shadow-[0_0_40px_rgba(212,145,30,0.3)] select-none" style={{ textShadow: "0 0 40px rgba(212,145,30,0.3), 0 0 80px rgba(212,145,30,0.1)" }}>M</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Solution */}
+      {/* Solution — reversed layout */}
       <section className="py-[100px] px-6 bg-[var(--bg-secondary)]">
-        <div className="max-w-[800px] mx-auto">
-          <h2 className="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">We built the engine we always wished existed.</h2>
-          <div className="space-y-6 text-[1.05rem] text-[var(--text-secondary)] leading-[1.8]">
-            <p>
-              Anomalist Studios began in production services. We built websites, ran campaigns, and produced content for clients across dozens of industries.
-            </p>
-            <p>
-              We kept hearing the same thing: <em>&ldquo;I know I need to post consistently, but I just don&apos;t have the time.&rdquo;</em>
-            </p>
-            <p>
-              So we built <strong className="text-[var(--text-primary)]">Maximus</strong> — a content engine that ingests everything about your brand — your voice, your audience, your competitors, your goals — and produces platform-native content every single day. No prompts. No scheduling. No uploading. Content shows up in your dashboard, you approve it, and it goes live.
-            </p>
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div className="space-y-6">
+              <div className="p-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-2xl font-extrabold text-[var(--accent)]">120+</span>
+                  <span className="text-sm text-[var(--text-muted)]">Posts/Month</span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">Per client, across all platforms</p>
+              </div>
+              <div className="p-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-2xl font-extrabold text-[var(--accent)]">🔍</span>
+                  <span className="text-sm font-semibold">Competitive Intel</span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">Weekly competitor research built into every content cycle</p>
+              </div>
+              <div className="p-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-2xl font-extrabold text-[var(--accent)]">📬</span>
+                  <span className="text-sm font-semibold">Delivered, Not DIY</span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">Content arrives in your dashboard. No software to learn.</p>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">We built the engine we always wished existed.</h2>
+              <div className="space-y-5 text-[1.05rem] text-[var(--text-secondary)] leading-[1.8]">
+                <p>Anomalist Studios started in production — cameras, microphones, editing bays. We spent years helping businesses tell their stories. But we kept running into the same problem: the content looked great, but nobody could keep the momentum going after the shoot was over.</p>
+                <p>Businesses didn&apos;t need another one-time deliverable. They needed a system that could produce content every single day, across every platform, in their voice — without requiring them to think about it.</p>
+                <p>So we built <strong className="text-[var(--text-primary)]">Maximus</strong> — a content engine that ingests everything about your brand and produces platform-native content that sounds like the business owner wrote it themselves.</p>
+                <p>Content gets delivered straight to your dashboard. You can post it yourself, hand it to your team, or let our social media management team handle everything.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -101,7 +188,7 @@ export default function AboutPage() {
             <p className="text-[1.05rem] text-[var(--text-secondary)] max-w-[500px] mx-auto mb-8">
               Complete our intake form. Tell us about your brand, your voice, and your competitors. Your first week of content is free.
             </p>
-            <Link href="/onboarding" className="btn btn-primary">Start Onboarding</Link>
+            <Link href="/onboarding" className="btn btn-primary">Start Onboarding →</Link>
           </div>
         </div>
       </section>
@@ -110,7 +197,7 @@ export default function AboutPage() {
       <footer className="border-t border-[var(--border)] bg-[var(--bg-secondary)] py-12 px-6">
         <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between gap-8">
           <div>
-            <p className="font-bold text-lg">Anomalist <span className="accent">Studios</span></p>
+            <img src="/logo.jpg" alt="Anomalist Studios" className="h-[60px] w-auto mb-2" />
             <p className="text-sm text-[var(--text-muted)] mt-2">Maximus by Anomalist Studios</p>
           </div>
           <div className="flex gap-8 text-sm text-[var(--text-secondary)]">

@@ -19,7 +19,7 @@ export default function ContactPage() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[var(--bg-primary)]/85 backdrop-blur-xl border-b border-[var(--border)]">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold">Anomalist <span className="accent">Studios</span></Link>
+          <Link href="/"><img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" /></Link>
           <Link href="/onboarding" className="btn btn-primary text-sm !py-2.5 !px-6">Get Started</Link>
         </div>
       </nav>
