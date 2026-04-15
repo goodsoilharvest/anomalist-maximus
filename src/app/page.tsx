@@ -1,19 +1,69 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+
+// ── Data ─────────────────────────────────────────────────────────────────────
 
 const proofItems = [
-  { number: "120+", text: "social posts/mo" },
-  { number: "4", text: "platforms daily" },
-  { number: "24hrs", text: "to first content" },
-  { number: "$0", text: "to start" },
+  { number: "120+", text: "social posts/mo per client" },
+  { number: "4", text: "platforms covered daily" },
+  { number: "24hrs", text: "from onboarding to first content" },
+  { number: "$0", text: "to start — first week free" },
+];
+
+const platformExamples = [
+  {
+    key: "facebook", icon: "📘", label: "Facebook",
+    avatar: "IO", name: "Iron Oak Coffee Co.", sub: "Sponsored · ",
+    body: "There's a reason we still hand-label every bag.\n\nIt's not efficient. Our roaster reminds us every Tuesday. But there's something about writing out \"Dark Roast — Batch #347\" by hand that keeps us honest. You can automate a lot of things. The stuff that matters isn't one of them.\n\nNew batch drops Friday. First 30 bags get a handwritten note with your order. Link in comments.",
+    stats: "142 likes · 23 comments · 8 shares",
+    why: "Storytelling + personal touch. Facebook rewards longer posts that generate comments. The \"first 30 bags\" creates urgency. The tone is warm but opinionated — it reads like the owner wrote it on their lunch break.",
+  },
+  {
+    key: "instagram", icon: "📷", label: "Instagram",
+    avatar: "IO", name: "ironoakcoffee", sub: "Original",
+    body: "Batch #347. Dark roast. Small batch. Hand-labeled because we're stubborn like that.\n\nDrop a ☕ if you're grabbing one this week.\n\n#ironoakcoffee #darkroast #smallbatchcoffee #localroaster #coffeecommunity #handcrafted #fridaydrop",
+    stats: "284 likes · 47 comments",
+    why: "Short, punchy, visual-first caption. Doesn't bury the lead. Hashtags are targeted, not stuffed. The CTA (\"drop a ☕\") is low-friction and boosts engagement rate for the algorithm.",
+  },
+  {
+    key: "linkedin", icon: "💼", label: "LinkedIn",
+    avatar: "IO", name: "Jake Mercer", sub: "Founder, Iron Oak Coffee Co.",
+    body: "We turned down a wholesale deal last month.\n\nA regional chain wanted to stock our dark roast in 40 locations. The volume would've tripled our revenue overnight.\n\nWe said no.\n\nNot because we don't want to grow — we do. But our roast profile only works in small batches. We tested it at scale. It tasted different. Not bad. Just… not ours.\n\nThe hardest part of running a small business isn't the hours. It's knowing when to say no to money that would change what you built.\n\nHas anyone else walked away from a deal that looked great on paper?",
+    stats: "1,247 likes · 89 comments · 34 reposts",
+    why: "Personal narrative from the founder. Vulnerable, contrarian take. Short paragraphs for scanability. Ends with a question that drives massive comment engagement.",
+  },
+  {
+    key: "gbp", icon: "📍", label: "Google Business",
+    avatar: "IO", name: "Iron Oak Coffee Co.", sub: "Local business",
+    body: "New batch alert: Dark Roast Batch #347 drops this Friday at 7 AM. Small batch, hand-labeled, roasted in-house. Last month's batch sold out in 3 days — grab yours early.\n\nStop by the roastery or order online for local delivery. Open Tuesday–Saturday, 6 AM – 2 PM.\n\n📍 127 Oak Street, downtown",
+    stats: "",
+    why: "GBP posts boost local search visibility — most small businesses ignore them entirely. This is action-oriented with location, hours, and a clear reason to visit.",
+  },
+  {
+    key: "blog", icon: "✍️", label: "Blog",
+    avatar: "IO", name: "Iron Oak Coffee Co.", sub: "Blog",
+    body: "Dark Roast vs. Medium Roast: What Nobody Tells You About Flavor\n\nMost people think dark roast means stronger coffee. It doesn't. Here's the difference nobody in the grocery aisle is explaining — and why it changes what you should be buying.",
+    stats: "",
+    why: "Targets a high-volume search query that people actually Google. Educational content builds authority and ranks for months — unlike social posts that disappear in 24 hours.",
+  },
+  {
+    key: "email", icon: "📧", label: "Email",
+    avatar: "IO", name: "Iron Oak Coffee Co.", sub: "Newsletter",
+    body: "Subject: Batch #347 drops Friday — here's what's different this time\n\nHey [First Name],\n\nQuick one this week. Batch #347 is our first roast from a new single-origin source in Guatemala — Finca El Volcán, grown at 5,200 feet.\n\nWe tested it three times before committing. Twice it was close. The third time, our roaster said \"that's the one\" before it even finished cooling.\n\nFirst 50 orders get a handwritten tasting note with the bag.\n\nSee you Friday.\n— Jake, Iron Oak",
+    stats: "",
+    why: "Personal tone from the founder, not a corporate blast. Tells a story that makes you want to try the product. Creates scarcity without being pushy. One clear CTA.",
+  },
 ];
 
 const services = [
-  { icon: "📱", title: "4 Daily Social Posts + More", desc: "One native post each for Facebook, Instagram, LinkedIn, and Google Business Profile. Plus blog articles, email campaigns, and ad copy." },
+  { icon: "✍️", title: "4 Daily Social Posts + More", desc: "One native post each for Facebook, Instagram, LinkedIn, and Google Business Profile. Plus blog articles, email campaigns, and ad copy." },
   { icon: "🔍", title: "Competitor Intelligence", desc: "Weekly competitive research on your market — what your competitors are doing and where they're falling short." },
   { icon: "📊", title: "Marketing Strategy", desc: "Weekly strategy briefs that drive your content direction, informed by top marketing insights." },
   { icon: "📧", title: "Email Marketing", desc: "Newsletters, drip sequences, and promotional emails crafted in your brand voice." },
   { icon: "📢", title: "Ad Copy & Campaigns", desc: "Promotional content, product highlights, event marketing — written and ready to run." },
-  { icon: "✍️", title: "Blog & Website Copy", desc: "SEO-friendly blog articles and website copy that builds authority and drives organic traffic." },
+  { icon: "🌐", title: "Blog & Website Copy", desc: "SEO-friendly blog articles and website copy that builds authority and drives organic traffic." },
 ];
 
 const industries = [
@@ -27,16 +77,16 @@ const industries = [
 
 const steps = [
   { num: "1", title: "Onboard", desc: "Complete our intake form — your brand, your voice, your competitors, your goals. Maximus builds a deep content profile for your business." },
-  { num: "2", title: "Research", desc: "Maximus runs weekly competitive intelligence on your market and pulls marketing insights from top industry thought leaders to inform your strategy." },
-  { num: "3", title: "Generate", desc: "Every day, Maximus produces 4 platform-native social posts plus weekly blog articles, email campaigns, and ad copy — informed by your brand profile." },
+  { num: "2", title: "Research", desc: "Maximus runs weekly competitive intelligence on your market and pulls marketing insights from top industry thought leaders." },
+  { num: "3", title: "Generate", desc: "Every day, Maximus produces 4 platform-native social posts plus weekly blog articles, email campaigns, and ad copy." },
   { num: "4", title: "Deliver", desc: "Content delivered to your dashboard daily — ready to approve, edit, or auto-publish. Maximus gets sharper with every cycle." },
 ];
 
 const metrics = [
-  { number: "120", suffix: "+", label: "Social Posts Monthly", detail: "Plus blog articles, email campaigns, and ad copy" },
-  { number: "4", suffix: "", label: "Platforms Daily", detail: "Facebook, Instagram, LinkedIn, Google Business Profile" },
-  { number: "52", suffix: "", label: "Intel Reports/Year", detail: "Weekly research on what your competition is doing" },
-  { number: "0", suffix: "", label: "Hours You Spend", detail: "Maximus does the work. You review or don't." },
+  { target: 120, suffix: "+", label: "Social Posts Monthly", detail: "Plus blog articles, email campaigns, and ad copy — vs. the 8–12 posts most businesses manage on their own" },
+  { target: 4, suffix: "", label: "Platforms Daily", detail: "Facebook, Instagram, LinkedIn, Google Business Profile" },
+  { target: 52, suffix: "", label: "Intel Reports/Year", detail: "Weekly research on what your competition is doing — and where they're falling short" },
+  { target: 0, suffix: "", label: "Hours You Spend", detail: "Maximus does the work. You review what shows up in your inbox — or don't. Your call." },
 ];
 
 const plans = [
@@ -70,61 +120,108 @@ const faqs = [
   { q: "Is this just ChatGPT with a wrapper?", a: "No. Maximus is a multi-agent system — not a single chatbot. It has dedicated intelligence for content writing, competitive research, marketing strategy, and email triage, all working together." },
   { q: "How fast do I get my first content?", a: "After you submit the intake form, we build your content profile within 24-48 hours. Your first batch of content typically lands in your dashboard within a few business days." },
   { q: "What platforms does Maximus create content for?", a: "Facebook, Instagram, LinkedIn, and Google Business Profile for daily social posts. Plus blog articles, email newsletters, and ad copy as add-ons." },
-  { q: "Do I have to use your recommended content?", a: "No. You review everything in your dashboard before it goes live. Edit, skip, or approve with one click. If you want us to manage posting for you, our Social Media Management add-on handles that completely." },
+  { q: "Do I have to use your recommended content?", a: "No. You review everything in your dashboard before it goes live. Edit, skip, or approve with one click." },
   { q: "What if I have a really niche industry?", a: "Maximus works across dozens of industries. During onboarding, we ask detailed questions about your specific niche, competitors, and audience. The more specific you are, the better the content." },
   { q: "Can I export the content and use it elsewhere?", a: "Absolutely. Your content is yours. You can edit it, republish it, use it anywhere you want." },
-  { q: "What if I'm not happy with the first week?", a: "We'll take feedback and retrain. Maximus learns from your feedback — tell us what's working and what isn't, and the next batch will be sharper." },
-  { q: "Can I cancel anytime?", a: "Yes. No contracts, no lock-in periods. Cancel anytime. You can also pause your subscription and restart it when you're ready." },
+  { q: "What if I'm not happy with the first week?", a: "We'll take feedback and retrain. Maximus learns from your feedback — the system gets better with every interaction." },
+  { q: "Can I cancel anytime?", a: "Yes. No contracts, no lock-in periods. Cancel anytime. You can also pause and restart when ready." },
   { q: "What industries does Maximus work with?", a: "Any local service business — firearms training, insurance agencies, fitness studios, restaurants, real estate, home services, healthcare, legal, automotive, and more." },
-  { q: "How is this different from hiring a social media manager?", a: "A social media manager costs $3,000–$5,000/month and still needs direction. Maximus handles content creation, competitive research, and strategy at a fraction of the cost. And it never takes PTO or misses a deadline." },
+  { q: "How is this different from hiring a social media manager?", a: "A social media manager costs $3,000–$5,000/month and still needs direction. Maximus handles content creation, competitive research, and strategy at a fraction of the cost. Never misses a deadline." },
 ];
 
+// ── Scroll reveal hook ───────────────────────────────────────────────────────
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, className: `transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}` };
+}
+
+function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const r = useReveal();
+  return <div ref={r.ref} className={`${r.className} ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
+}
+
+// ── Counter component ────────────────────────────────────────────────────────
+function Counter({ target, suffix }: { target: number; suffix: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [value, setValue] = useState(0);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { setStarted(true); obs.disconnect(); } }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [started]);
+  useEffect(() => {
+    if (!started) return;
+    const duration = 1500;
+    const steps = 40;
+    const increment = target / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= target) { setValue(target); clearInterval(interval); }
+      else setValue(Math.floor(current));
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [started, target]);
+  return <span ref={ref}>{value}{suffix}</span>;
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState("facebook");
+
   return (
     <>
-      {/* ── Nav ────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[var(--bg-primary)]/85 backdrop-blur-xl border-b border-transparent hover:border-[var(--border)] transition-colors">
+      {/* ── Nav ───────────────────────────────────────────── */}
+      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[rgba(10,10,10,0.85)] backdrop-blur-xl border-b border-transparent transition-all">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center h-full">
-            <span className="text-xl font-bold text-[var(--text-primary)]">Anomalist <span className="text-[var(--accent)]">Studios</span></span>
+            <span className="text-xl font-bold text-[var(--text-primary)]">Anomalist <span className="accent">Studios</span></span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Home</Link>
-            <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">About</Link>
-            <Link href="/blog" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Blog</Link>
+            <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-primary)]">Home</Link>
+            <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">About</Link>
+            <Link href="/blog" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Blog</Link>
             <Link href="/onboarding" className="btn btn-primary text-sm !py-2.5 !px-6">Get Started</Link>
           </div>
           <Link href="/onboarding" className="md:hidden btn btn-primary text-sm !py-2 !px-5">Get Started</Link>
         </div>
       </nav>
 
-      {/* ── Hero ───────────────────────────────────────────── */}
+      {/* ── Hero (left-aligned) ────────────────────────────── */}
       <section className="min-h-screen flex items-center relative overflow-hidden pt-[72px]">
-        {/* Video background */}
         <div className="absolute inset-0 z-0">
           <video autoPlay muted loop playsInline className="w-full h-full object-cover">
             <source src="https://anomalistmaximus.com/images/intro.mp4" type="video/mp4" />
           </video>
         </div>
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-[var(--bg-primary)]/80 z-[1]" />
-        {/* Bottom gradient fade */}
+        <div className="absolute inset-0 bg-[rgba(10,10,10,0.80)] z-[1]" />
         <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-[var(--bg-primary)] to-transparent z-[1]" />
 
-        <div className="relative z-[2] max-w-[1200px] mx-auto px-6">
+        <div className="relative z-[2] max-w-[1200px] mx-auto px-6 w-full">
           <div className="max-w-[750px]">
-            <p className="animate-fade-up uppercase text-xs font-semibold tracking-[4px] text-[var(--accent)] mb-6">AI-Powered Content Marketing</p>
-            <h1 className="animate-fade-up animate-delay-1 text-[clamp(2.5rem,6vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-1.5px] mb-6">
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[4px] text-[var(--accent)] mb-6">AI-Powered Content Marketing</p></Reveal>
+            <Reveal delay={100}><h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-1.5px] mb-6">
               Stop Posting.<br /><span className="accent">Start Growing.</span>
-            </h1>
-            <p className="animate-fade-up animate-delay-2 text-[1.2rem] text-[var(--text-secondary)] max-w-[550px] mb-10 leading-[1.7]">
+            </h1></Reveal>
+            <Reveal delay={200}><p className="text-[1.2rem] text-[var(--text-secondary)] max-w-[550px] mb-10 leading-[1.7]">
               Maximus creates 120+ brand-matched social media posts per month across Facebook, Instagram,
               LinkedIn, and Google Business Profile — so you can run your business instead of running your socials.
-            </p>
-            <div className="animate-fade-up animate-delay-3 flex gap-4 flex-wrap">
-              <Link href="/onboarding" className="btn btn-primary">Start Free — First Week On Us</Link>
-              <Link href="#examples" className="btn btn-outline">See Real Examples</Link>
-            </div>
+            </p></Reveal>
+            <Reveal delay={300}><div className="flex gap-4 flex-wrap">
+              <Link href="/onboarding" className="btn btn-primary">Start Free — First Week On Us →</Link>
+              <Link href="#examples" className="btn btn-outline">See Real Examples ▶</Link>
+            </div></Reveal>
           </div>
         </div>
       </section>
@@ -133,77 +230,134 @@ export default function HomePage() {
       <section className="py-8 bg-[var(--bg-secondary)] border-b border-[var(--border)]">
         <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center gap-8 flex-wrap">
           {proofItems.map((item, i) => (
-            <div key={item.text} className="flex items-baseline gap-2" style={{ opacity: 0, animation: `fadeUp 0.5s ease ${0.3 + i * 0.15}s forwards` }}>
-              <span className="proof-number">{item.number}</span>
-              <span className="text-[0.8rem] text-[var(--text-muted)] font-medium">{item.text}</span>
-              {i < proofItems.length - 1 && <span className="hidden md:block w-px h-7 bg-[var(--border)] ml-6" />}
-            </div>
+            <Reveal key={item.text} delay={i * 100}>
+              <div className="flex items-baseline gap-2">
+                <span className="proof-number">{item.number}</span>
+                <span className="text-[0.8rem] text-[var(--text-muted)] font-medium">{item.text}</span>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ── Example Comparison ─────────────────────────────── */}
+      {/* ── See It In Action (centered) ────────────────────── */}
       <section id="examples" className="py-[100px] px-6">
-        <div className="max-w-[1200px] mx-auto">
-          <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">See It In Action</p>
-          <h2 className="text-[clamp(2rem,4vw,3rem)] mb-5">But will it actually sound like <span className="accent">me</span>?</h2>
-          <p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mb-12">
-            Here&apos;s a fictional brand — Iron Oak Coffee Co., a small-town roastery — run through Maximus. Same brand, six platforms, every post native.
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-8">
-              <p className="uppercase text-xs font-semibold tracking-[3px] text-red-400 mb-4">Generic AI</p>
-              <p className="text-[var(--text-secondary)] italic leading-relaxed mb-4">
-                &ldquo;Looking for great coffee? Visit our shop for the best beans in town! We offer a variety of roasts and brewing methods. Come see us today! ☕ #coffee #coffeeshop #bestcoffee #coffeelover&rdquo;
-              </p>
-              <p className="text-xs text-red-400">Sounds like every other coffee shop on earth. No voice. No personality. Pure template.</p>
+        <div className="max-w-[1200px] mx-auto text-center">
+          <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">See It In Action</p></Reveal>
+          <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-5">&ldquo;But will it actually sound like <span className="accent">me</span>?&rdquo;</h2></Reveal>
+          <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto mb-12">
+            Here&apos;s a fictional brand — <strong className="text-[var(--text-primary)]">Iron Oak Coffee Co.</strong>, a small-town roastery — run through Maximus. Same brand, six platforms, every post native.
+          </p></Reveal>
+
+          {/* Before / After cards */}
+          <Reveal delay={300}>
+            <div className="grid md:grid-cols-2 gap-6 mb-14 text-left">
+              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 text-xs">✕</span>
+                  <span className="uppercase text-xs font-semibold tracking-[2px] text-red-400">Generic AI</span>
+                </div>
+                <p className="text-[var(--text-secondary)] italic leading-relaxed mb-4">
+                  &ldquo;Looking for great coffee? Visit our shop for the best beans in town! We offer a variety of roasts and brewing methods. Come see us today! ☕ #coffee #coffeeshop #bestcoffee #coffeelover&rdquo;
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">Sounds like every other coffee shop on earth. No voice. No personality. Pure template.</p>
+              </div>
+              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-7 h-7 rounded-full bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)] text-xs">✓</span>
+                  <span className="uppercase text-xs font-semibold tracking-[2px] text-[var(--accent)]">Maximus</span>
+                </div>
+                <p className="text-[var(--text-primary)] leading-relaxed mb-4">
+                  &ldquo;We don&apos;t do light roasts. Nothing against them — they&apos;re just not what we wake up for. Our dark roast is slow-roasted in small batches, the way it was done before coffee got complicated. Stop by. Bring your thermos. You&apos;ll taste the difference before you leave the parking lot.&rdquo;
+                </p>
+                <p className="text-xs text-[var(--accent)]">Opinionated. Confident. Sounds like a real person who gives a damn about their coffee.</p>
+              </div>
             </div>
-            <div className="rounded-xl border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-8">
-              <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-4">Maximus</p>
-              <p className="text-[var(--text-primary)] leading-relaxed mb-4">
-                &ldquo;We don&apos;t do light roasts. Nothing against them — they&apos;re just not what we wake up for. Our dark roast is slow-roasted in small batches, the way it was done before coffee got complicated. Stop by. Bring your thermos. You&apos;ll taste the difference before you leave the parking lot.&rdquo;
-              </p>
-              <p className="text-xs text-[var(--accent)]">Opinionated. Confident. Sounds like a real person who gives a damn about their coffee.</p>
+          </Reveal>
+
+          {/* Platform tabs */}
+          <Reveal delay={400}>
+            <h3 className="text-[1.15rem] text-[var(--text-secondary)] font-medium mb-8">Same brand. Four platforms + blog + email. Each one native.</h3>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {platformExamples.map(p => (
+                <button key={p.key} onClick={() => setActiveTab(p.key)}
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === p.key ? "bg-[var(--accent)] text-[var(--bg-primary)]" : "bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-light)]"}`}>
+                  <span>{p.icon}</span> {p.label}
+                </button>
+              ))}
             </div>
-          </div>
+          </Reveal>
+
+          {/* Active panel */}
+          {platformExamples.filter(p => p.key === activeTab).map(p => (
+            <div key={p.key} className="max-w-[700px] mx-auto text-left">
+              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-8 mb-4">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-sm font-bold text-[var(--accent)]">{p.avatar}</div>
+                  <div>
+                    <p className="font-semibold text-sm">{p.name}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{p.sub}</p>
+                  </div>
+                </div>
+                <p className="text-[var(--text-primary)] leading-[1.7] whitespace-pre-line text-[0.95rem]">{p.body}</p>
+                {p.stats && <p className="text-xs text-[var(--text-muted)] mt-4 pt-4 border-t border-[var(--border)]">{p.stats}</p>}
+              </div>
+              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-6">
+                <p className="text-sm"><strong className="text-[var(--accent)]">Why it works on {p.label}:</strong>{" "}
+                  <span className="text-[var(--text-secondary)]">{p.why}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+
+          <Reveal>
+            <div className="mt-12">
+              <p className="text-[var(--text-muted)] text-[0.9rem] max-w-[550px] mx-auto mb-5">
+                This is what Maximus produces — platform-native, voice-matched content that sounds like the brand owner wrote it. Every day. For every client.
+              </p>
+              <Link href="/onboarding" className="btn btn-primary">See What Maximus Writes for You →</Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── Services ───────────────────────────────────────── */}
+      {/* ── Industries ─────────────────────────────────────── */}
       <section className="py-[100px] px-6 bg-[var(--bg-secondary)]">
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-12">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Meet Maximus</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">AI-Powered Content for Every Platform</h2>
-            <p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto">One system. Unlimited content. All the platforms you&apos;re already on.</p>
-          </div>
+          <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Industries</p></Reveal>
+          <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">Built for businesses that serve their community.</h2></Reveal>
+          <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mb-12">Industry-specific content that sounds like it came from inside your business — because it learned from inside your business.</p></Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map(s => (
-              <div key={s.title} className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-9 card-hover">
-                <div className="service-icon mb-5"><span>{s.icon}</span></div>
-                <h3 className="text-[1.15rem] font-bold mb-2.5">{s.title}</h3>
-                <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{s.desc}</p>
-              </div>
+            {industries.map((ind, i) => (
+              <Reveal key={ind.name} delay={i * 80}>
+                <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-9 card-hover h-full">
+                  <div className="service-icon mb-5"><span>{ind.icon}</span></div>
+                  <h3 className="text-[1.15rem] font-bold mb-2.5">{ind.name}</h3>
+                  <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{ind.desc}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Industries ─────────────────────────────────────── */}
+      {/* ── Services ───────────────────────────────────────── */}
       <section className="py-[100px] px-6">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-12">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Industries</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">Built for businesses that serve their community.</h2>
-            <p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto">Industry-specific content that sounds like it came from inside your business.</p>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Meet Maximus</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">AI-Powered Social Media Content for Every Platform</h2></Reveal>
+            <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto">One system. Unlimited content. All the platforms you&apos;re already on.</p></Reveal>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {industries.map(ind => (
-              <div key={ind.name} className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-9 card-hover">
-                <span className="text-3xl block mb-4">{ind.icon}</span>
-                <h3 className="text-[1.15rem] font-bold mb-2.5">{ind.name}</h3>
-                <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{ind.desc}</p>
-              </div>
+            {services.map((s, i) => (
+              <Reveal key={s.title} delay={i * 80}>
+                <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-9 card-hover h-full">
+                  <div className="service-icon mb-5"><span>{s.icon}</span></div>
+                  <h3 className="text-[1.15rem] font-bold mb-2.5">{s.title}</h3>
+                  <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{s.desc}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -213,55 +367,61 @@ export default function HomePage() {
       <section className="py-[100px] px-6 bg-[var(--bg-secondary)]">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-14">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Process</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">How AI Content Marketing Works</h2>
-            <p className="text-[1.1rem] text-[var(--text-secondary)]">Tell us about your brand. Maximus does the rest.</p>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Process</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">How AI Content Marketing Works — 4 Simple Steps</h2></Reveal>
+            <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)]">Tell us about your brand. Maximus does the rest.</p></Reveal>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map(s => (
-              <div key={s.num} className="text-center">
-                <div className="step-circle mx-auto mb-5">{s.num}</div>
-                <h3 className="text-[1.1rem] font-bold mb-2.5">{s.title}</h3>
-                <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{s.desc}</p>
-              </div>
+            {steps.map((s, i) => (
+              <Reveal key={s.num} delay={i * 100}>
+                <div className="text-center">
+                  <div className="step-circle mx-auto mb-5">{s.num}</div>
+                  <h3 className="text-[1.1rem] font-bold mb-2.5">{s.title}</h3>
+                  <p className="text-[0.9rem] text-[var(--text-secondary)] leading-relaxed">{s.desc}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── The Numbers ────────────────────────────────────── */}
+      {/* ── The Numbers (with counters) ────────────────────── */}
       <section className="py-[100px] px-6">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-12">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">The Numbers</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">What happens when Maximus runs your content.</h2>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">The Numbers</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">What happens when Maximus runs your content.</h2></Reveal>
+            <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)]">Most businesses post 3–4 times a week and call it marketing. Here&apos;s what changes.</p></Reveal>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {metrics.map(m => (
-              <div key={m.label} className="text-center p-9 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl card-hover">
-                <div><span className="metric-number">{m.number}</span>{m.suffix && <span className="text-[2rem] font-bold text-[var(--accent)]">{m.suffix}</span>}</div>
-                <p className="text-[0.95rem] font-semibold mt-3 mb-1.5">{m.label}</p>
-                <p className="text-[0.8rem] text-[var(--text-muted)] leading-relaxed">{m.detail}</p>
-              </div>
+            {metrics.map((m, i) => (
+              <Reveal key={m.label} delay={i * 100}>
+                <div className="text-center p-9 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl card-hover">
+                  <div className="metric-number"><Counter target={m.target} suffix={m.suffix} /></div>
+                  <p className="text-[0.95rem] font-semibold mt-3 mb-1.5">{m.label}</p>
+                  <p className="text-[0.8rem] text-[var(--text-muted)] leading-relaxed">{m.detail}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
-          {/* Comparison bars */}
           <div className="max-w-[700px] mx-auto mt-16">
-            <h3 className="text-center text-lg font-bold mb-8">Monthly Content Volume</h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <span className="text-[0.85rem] font-semibold text-[var(--text-secondary)] w-[140px] text-right">Without Maximus</span>
-                <div className="flex-1 bg-[var(--bg-card)] rounded-md h-8 overflow-hidden">
-                  <div className="comparison-bar bg-[var(--border-light)] text-[var(--text-muted)]" style={{ width: "10%" }}>~12</div>
+            <Reveal>
+              <h3 className="text-center text-lg font-bold mb-8">Monthly Content Volume</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-[0.85rem] font-semibold text-[var(--text-secondary)] w-[140px] text-right">Without Maximus</span>
+                  <div className="flex-1 bg-[var(--bg-card)] rounded-md h-8 overflow-hidden">
+                    <div className="comparison-bar bg-[var(--border-light)] text-[var(--text-muted)]" style={{ width: "10%" }}>~12</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[0.85rem] font-semibold text-[var(--text-secondary)] w-[140px] text-right">With Maximus</span>
+                  <div className="flex-1 bg-[var(--bg-card)] rounded-md h-8 overflow-hidden">
+                    <div className="comparison-bar bg-[var(--accent)] text-[var(--bg-primary)]" style={{ width: "100%" }}>120+</div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[0.85rem] font-semibold text-[var(--text-secondary)] w-[140px] text-right">With Maximus</span>
-                <div className="flex-1 bg-[var(--bg-card)] rounded-md h-8 overflow-hidden">
-                  <div className="comparison-bar bg-[var(--accent)] text-[var(--bg-primary)]" style={{ width: "100%" }}>120+</div>
-                </div>
-              </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -270,31 +430,33 @@ export default function HomePage() {
       <section className="py-[100px] px-6 bg-[var(--bg-secondary)]">
         <div className="max-w-[800px] mx-auto">
           <div className="text-center mb-12">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Why Maximus</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">How Maximus compares.</h2>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Why Maximus</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)]">How Maximus compares.</h2></Reveal>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="text-left py-4 px-4 text-[var(--text-muted)] font-medium">Feature</th>
-                  <th className="text-center py-4 px-4 text-[var(--accent)] font-bold">Maximus</th>
-                  <th className="text-center py-4 px-4 text-[var(--text-muted)] font-medium">DIY AI Tools</th>
-                  <th className="text-center py-4 px-4 text-[var(--text-muted)] font-medium">Freelancer</th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.map(row => (
-                  <tr key={row.feature} className="border-b border-[var(--border)]/50">
-                    <td className="py-3 px-4">{row.feature}</td>
-                    <td className="py-3 px-4 text-center font-semibold text-[var(--accent)]">{row.m}</td>
-                    <td className="py-3 px-4 text-center text-[var(--text-muted)]">{row.d}</td>
-                    <td className="py-3 px-4 text-center text-[var(--text-muted)]">{row.f}</td>
+          <Reveal delay={200}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--border)]">
+                    <th className="text-left py-4 px-4 text-[var(--text-muted)] font-medium">Feature</th>
+                    <th className="text-center py-4 px-4 text-[var(--accent)] font-bold">Maximus</th>
+                    <th className="text-center py-4 px-4 text-[var(--text-muted)] font-medium">DIY AI Tools</th>
+                    <th className="text-center py-4 px-4 text-[var(--text-muted)] font-medium">Freelancer</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {comparison.map(row => (
+                    <tr key={row.feature} className="border-b border-[var(--border)]/50">
+                      <td className="py-3 px-4">{row.feature}</td>
+                      <td className="py-3 px-4 text-center font-semibold text-[var(--accent)]">{row.m}</td>
+                      <td className="py-3 px-4 text-center text-[var(--text-muted)]">{row.d}</td>
+                      <td className="py-3 px-4 text-center text-[var(--text-muted)]">{row.f}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -302,37 +464,34 @@ export default function HomePage() {
       <section id="pricing" className="py-[100px] px-6">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-4">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Pricing</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">Choose a plan or build your own.</h2>
-            <p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto mb-2">Pre-built packages to get you started fast.</p>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">Pricing</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)] mb-4">Choose a plan or build your own.</h2></Reveal>
+            <Reveal delay={200}><p className="text-[1.1rem] text-[var(--text-secondary)] max-w-[600px] mx-auto mb-2">Pre-built packages to get you started fast.</p></Reveal>
             <p className="text-[var(--accent)] text-sm font-semibold mb-12">First week of content free after onboarding</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            {plans.map(plan => (
-              <div key={plan.name} className={`bg-[var(--bg-card)] border border-[var(--border)] rounded-[14px] p-9 relative card-hover ${plan.featured ? "pricing-featured" : ""}`}>
-                {plan.featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-[var(--bg-primary)] text-[0.7rem] font-bold uppercase tracking-[1.5px] py-1.5 px-5 rounded-full">Recommended</div>
-                )}
-                <div className="mb-5">
+            {plans.map((plan, i) => (
+              <Reveal key={plan.name} delay={i * 100}>
+                <div className={`bg-[var(--bg-card)] border border-[var(--border)] rounded-[14px] p-9 relative card-hover ${plan.featured ? "pricing-featured" : ""}`}>
+                  {plan.featured && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-[var(--bg-primary)] text-[0.7rem] font-bold uppercase tracking-[1.5px] py-1.5 px-5 rounded-full">Recommended</div>
+                  )}
                   <h3 className="text-[1.35rem] font-bold mb-1.5">{plan.name}</h3>
+                  <div className="mb-6 pb-5 border-b border-[var(--border)]">
+                    <span className={`text-[2.5rem] font-extrabold tracking-[-1px] ${plan.featured ? "text-[var(--accent)]" : ""}`}>${plan.price}</span>
+                    <span className="text-[0.9rem] text-[var(--text-muted)] ml-1">/month</span>
+                  </div>
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-baseline gap-2.5 text-[0.88rem] text-[var(--text-secondary)]">
+                        <span className="text-[var(--accent)] text-[0.7rem] shrink-0 mt-0.5">✦</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="pricing-pitch mb-6">{plan.pitch}</div>
+                  <Link href="/onboarding" className={`btn w-full justify-center text-sm ${plan.featured ? "btn-primary" : "btn-outline"}`}>Get Started</Link>
                 </div>
-                <div className="mb-6 pb-5 border-b border-[var(--border)]">
-                  <span className={`text-[2.5rem] font-extrabold tracking-[-1px] ${plan.featured ? "text-[var(--accent)]" : ""}`}>${plan.price}</span>
-                  <span className="text-[0.9rem] text-[var(--text-muted)] ml-1">/month</span>
-                </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map(f => (
-                    <li key={f} className="flex items-baseline gap-2.5 text-[0.88rem] text-[var(--text-secondary)]">
-                      <span className="text-[var(--accent)] text-[0.7rem] shrink-0 mt-0.5">✦</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="pricing-pitch mb-6">{plan.pitch}</div>
-                <Link href="/onboarding" className={`btn w-full justify-center text-sm ${plan.featured ? "btn-primary" : "btn-outline"}`}>
-                  Get Started
-                </Link>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -342,18 +501,20 @@ export default function HomePage() {
       <section id="faq" className="py-[100px] px-6 bg-[var(--bg-secondary)]">
         <div className="max-w-[800px] mx-auto">
           <div className="text-center mb-12">
-            <p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">FAQ</p>
-            <h2 className="text-[clamp(2rem,4vw,3rem)]">Questions before you start.</h2>
+            <Reveal><p className="uppercase text-xs font-semibold tracking-[3px] text-[var(--accent)] mb-3">FAQ</p></Reveal>
+            <Reveal delay={100}><h2 className="text-[clamp(2rem,4vw,3rem)]">Questions before you start.</h2></Reveal>
           </div>
           <div className="space-y-2">
-            {faqs.map(faq => (
-              <details key={faq.q} className="group bg-[var(--bg-card)] border border-[var(--border)] rounded-[10px] overflow-hidden transition-colors open:border-[var(--border-light)]">
-                <summary className="cursor-pointer p-[18px_22px] font-semibold text-[0.95rem] flex items-center justify-between gap-4 hover:text-[var(--accent)] transition-colors">
-                  {faq.q}
-                  <span className="text-[var(--text-muted)] text-xs group-open:rotate-180 transition-transform shrink-0">▼</span>
-                </summary>
-                <div className="px-[22px] pb-5 text-[0.9rem] text-[var(--text-secondary)] leading-[1.7]">{faq.a}</div>
-              </details>
+            {faqs.map((faq, i) => (
+              <Reveal key={faq.q} delay={i * 40}>
+                <details className="group bg-[var(--bg-card)] border border-[var(--border)] rounded-[10px] overflow-hidden transition-colors open:border-[var(--border-light)]">
+                  <summary className="cursor-pointer p-[18px_22px] font-semibold text-[0.95rem] flex items-center justify-between gap-4 hover:text-[var(--accent)] transition-colors">
+                    {faq.q}
+                    <span className="text-[var(--text-muted)] text-xs group-open:rotate-180 transition-transform shrink-0">▼</span>
+                  </summary>
+                  <div className="px-[22px] pb-5 text-[0.9rem] text-[var(--text-secondary)] leading-[1.7]">{faq.a}</div>
+                </details>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -362,13 +523,15 @@ export default function HomePage() {
       {/* ── CTA Banner ─────────────────────────────────────── */}
       <section className="py-[100px] px-6">
         <div className="max-w-[1200px] mx-auto">
-          <div className="cta-gradient rounded-2xl p-[60px_48px] text-center">
-            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold mb-4">Ready to never worry about content again?</h2>
-            <p className="text-[1.05rem] text-[var(--text-secondary)] max-w-[500px] mx-auto mb-8">
-              Complete our intake form and Maximus starts learning your brand immediately. Your first week of content is on us.
-            </p>
-            <Link href="/onboarding" className="btn btn-primary">Start Onboarding</Link>
-          </div>
+          <Reveal>
+            <div className="cta-gradient rounded-2xl p-[60px_48px] text-center">
+              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold mb-4">Ready to never worry about content again?</h2>
+              <p className="text-[1.05rem] text-[var(--text-secondary)] max-w-[500px] mx-auto mb-8">
+                Complete our intake form and Maximus starts learning your brand immediately. Your first week of content is on us.
+              </p>
+              <Link href="/onboarding" className="btn btn-primary">Start Onboarding →</Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -377,31 +540,31 @@ export default function HomePage() {
         <div className="max-w-[1200px] mx-auto px-6 py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="sm:col-span-2 md:col-span-1">
-              <p className="text-lg font-bold mb-2">Anomalist <span className="text-[var(--accent)]">Studios</span></p>
+              <p className="text-lg font-bold mb-2">Anomalist <span className="accent">Studios</span></p>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">Maximus by Anomalist Studios — AI-powered content and marketing, delivered to your dashboard.</p>
             </div>
             <div>
               <h4 className="text-sm font-semibold uppercase tracking-wide mb-4">Pages</h4>
               <div className="space-y-2 text-sm text-[var(--text-secondary)]">
-                <Link href="/" className="block hover:text-[var(--text-primary)] transition-colors">Home</Link>
-                <Link href="/about" className="block hover:text-[var(--text-primary)] transition-colors">About</Link>
-                <Link href="/blog" className="block hover:text-[var(--text-primary)] transition-colors">Blog</Link>
-                <Link href="/onboarding" className="block hover:text-[var(--text-primary)] transition-colors">Get Started</Link>
+                <Link href="/" className="block hover:text-[var(--text-primary)]">Home</Link>
+                <Link href="/about" className="block hover:text-[var(--text-primary)]">About</Link>
+                <Link href="/blog" className="block hover:text-[var(--text-primary)]">Blog</Link>
+                <Link href="/onboarding" className="block hover:text-[var(--text-primary)]">Get Started</Link>
               </div>
             </div>
             <div>
               <h4 className="text-sm font-semibold uppercase tracking-wide mb-4">Legal</h4>
               <div className="space-y-2 text-sm text-[var(--text-secondary)]">
-                <Link href="/privacy" className="block hover:text-[var(--text-primary)] transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="block hover:text-[var(--text-primary)] transition-colors">Terms of Service</Link>
-                <Link href="/contact" className="block hover:text-[var(--text-primary)] transition-colors">Contact</Link>
+                <Link href="/privacy" className="block hover:text-[var(--text-primary)]">Privacy Policy</Link>
+                <Link href="/terms" className="block hover:text-[var(--text-primary)]">Terms of Service</Link>
+                <Link href="/contact" className="block hover:text-[var(--text-primary)]">Contact</Link>
               </div>
             </div>
             <div>
               <h4 className="text-sm font-semibold uppercase tracking-wide mb-4">Client</h4>
               <div className="space-y-2 text-sm text-[var(--text-secondary)]">
-                <Link href="/login" className="block hover:text-[var(--text-primary)] transition-colors">Client Login</Link>
-                <Link href="/dashboard" className="block hover:text-[var(--text-primary)] transition-colors">Dashboard</Link>
+                <Link href="/login" className="block hover:text-[var(--text-primary)]">Client Login</Link>
+                <Link href="/dashboard" className="block hover:text-[var(--text-primary)]">Dashboard</Link>
               </div>
             </div>
           </div>
