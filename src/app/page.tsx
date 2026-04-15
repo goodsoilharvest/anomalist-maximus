@@ -179,15 +179,17 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("facebook");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <>
       {/* ── Nav ───────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[rgba(10,10,10,0.85)] backdrop-blur-xl border-b border-transparent transition-all">
+      <nav className="fixed top-0 left-0 right-0 z-[1000] bg-[rgba(10,10,10,0.85)] backdrop-blur-xl border-b border-[var(--border)] transition-all">
         <div className="max-w-[1200px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center h-full">
             <img src="/logo.jpg" alt="Anomalist Studios" className="h-[44px] w-auto" />
           </Link>
+          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link text-[0.9rem] font-medium text-[var(--text-primary)]">Home</Link>
             <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">About</Link>
@@ -196,7 +198,28 @@ export default function HomePage() {
             <span className="w-px h-5 bg-[var(--border)]" />
             <Link href="/login" className="text-[0.85rem] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">Client Login</Link>
           </div>
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden flex flex-col gap-[5px] p-2"
+            onClick={() => setMobileNavOpen(o => !o)}
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-6 h-0.5 bg-[var(--text-primary)] transition-all duration-200 ${mobileNavOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+            <span className={`block w-6 h-0.5 bg-[var(--text-primary)] transition-all duration-200 ${mobileNavOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-6 h-0.5 bg-[var(--text-primary)] transition-all duration-200 ${mobileNavOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+          </button>
         </div>
+        {/* Mobile dropdown */}
+        {mobileNavOpen && (
+          <div className="md:hidden border-t border-[var(--border)] bg-[rgba(10,10,10,0.97)] px-6 py-4 flex flex-col gap-4">
+            <Link href="/" onClick={() => setMobileNavOpen(false)} className="text-[0.95rem] font-medium text-[var(--text-primary)]">Home</Link>
+            <Link href="/about" onClick={() => setMobileNavOpen(false)} className="text-[0.95rem] font-medium text-[var(--text-secondary)]">About</Link>
+            <Link href="/blog" onClick={() => setMobileNavOpen(false)} className="text-[0.95rem] font-medium text-[var(--text-secondary)]">Blog</Link>
+            <Link href="/onboarding" onClick={() => setMobileNavOpen(false)} className="text-[0.95rem] font-medium text-[var(--text-secondary)]">Get Started</Link>
+            <div className="w-full h-px bg-[var(--border)]" />
+            <Link href="/login" onClick={() => setMobileNavOpen(false)} className="text-[0.9rem] font-medium text-[var(--text-muted)]">Client Login</Link>
+          </div>
+        )}
       </nav>
 
       {/* ── Hero (left-aligned) ────────────────────────────── */}
