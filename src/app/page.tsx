@@ -193,6 +193,8 @@ export default function HomePage() {
             <Link href="/about" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">About</Link>
             <Link href="/blog" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Blog</Link>
             <Link href="/onboarding" className="nav-link text-[0.9rem] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Get Started</Link>
+            <span className="w-px h-5 bg-[var(--border)]" />
+            <Link href="/login" className="text-[0.85rem] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">Client Login</Link>
           </div>
         </div>
       </nav>
